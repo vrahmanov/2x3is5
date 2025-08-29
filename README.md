@@ -99,7 +99,7 @@ This will:
 
 Watch the complete deployment process in action:
 
-![Demo Video](demo-lfs-git-ignore.mp4)
+[![Demo Video](https://img.youtube.com/vi/deTHkfW0PTU/0.jpg)](https://youtu.be/deTHkfW0PTU)
 
 *Note: The video demonstrates the entire workflow from setup to testing, showing how easy it is to deploy the music app using GitOps principles.*
 
