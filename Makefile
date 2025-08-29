@@ -28,10 +28,11 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "$(GREEN)Main workflow:$(NC)"
-	@echo "  make infra_setup    # Setup K3D cluster with ArgoCD"
-	@echo "  make app_build      # Build the music application"
-	@echo "  make app_deploy     # Deploy using GitOps"
-	@echo "  make app_test       # Test the deployment"
+	@echo "  make check-requirements  # Check system requirements"
+	@echo "  make infra_setup         # Setup K3D cluster with ArgoCD"
+	@echo "  make app_build           # Build the music application"
+	@echo "  make app_deploy          # Deploy using GitOps"
+	@echo "  make app_test            # Test the deployment"
 	@echo ""
 	@echo "$(GREEN)Or run everything:$(NC)"
 	@echo "  make all            # Complete deployment workflow"
@@ -45,7 +46,12 @@ help: ## Show this help message
 
 # Main workflow targets
 .PHONY: all
-all: infra_setup app_build app_deploy app_test ## Complete deployment workflow
+all: check-requirements infra_setup app_build app_deploy app_test ## Complete deployment workflow
+
+.PHONY: check-requirements
+check-requirements: ## Check all system requirements before deployment
+	@echo "$(BLUE)[STEP]$(NC) Checking system requirements..."
+	@./scripts/check-requirements.sh
 
 .PHONY: infra_setup
 infra_setup: ## Setup K3D cluster with ArgoCD and all infrastructure
@@ -54,13 +60,13 @@ infra_setup: ## Setup K3D cluster with ArgoCD and all infrastructure
 	@echo "$(GREEN)[INFO]$(NC) Infrastructure setup completed"
 
 .PHONY: app_build
-app_build: ## Build the music application
+app_build: check-requirements ## Build the music application
 	@echo "$(BLUE)[STEP]$(NC) Building music application..."
 	@./apps/music-app/build.sh
 	@echo "$(GREEN)[INFO]$(NC) Application build completed"
 
 .PHONY: app_deploy
-app_deploy: ## Deploy application using GitOps
+app_deploy: check-requirements ## Deploy application using GitOps
 	@echo "$(BLUE)[STEP]$(NC) Deploying application with GitOps..."
 	@./apps/music-app/deploy.sh
 	@echo "$(GREEN)[INFO]$(NC) Application deployment completed"
@@ -110,9 +116,9 @@ dev_test: ## Run development tests
 
 # Utility targets
 .PHONY: check-deps
-check-deps: ## Check if all dependencies are installed
+check-deps: ## Check if all dependencies are installed (alias for check-requirements)
 	@echo "$(BLUE)[STEP]$(NC) Checking dependencies..."
-	@./scripts/check-deps.sh
+	@./scripts/check-requirements.sh
 
 .PHONY: update-configs
 update-configs: ## Update configuration files
@@ -173,7 +179,7 @@ gitops-status: ## Check GitOps status
 
 # Quick targets for common operations
 .PHONY: quick-deploy
-quick-deploy: app_build app_deploy ## Quick deploy (skip infra setup)
+quick-deploy: check-requirements app_build app_deploy ## Quick deploy (skip infra setup)
 
 .PHONY: quick-test
 quick-test: app_test ## Quick test only

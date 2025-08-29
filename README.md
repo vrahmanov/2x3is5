@@ -124,6 +124,7 @@ make app_test
 ## 🛠️ **Available Make Targets**
 
 ### **Main Workflow**
+- `make check-requirements` - Check all system requirements before deployment
 - `make all` - Complete deployment workflow
 - `make infra_setup` - Setup K3D cluster with ArgoCD
 - `make app_build` - Build the music application
