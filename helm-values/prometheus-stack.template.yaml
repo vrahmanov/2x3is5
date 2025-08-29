@@ -1,0 +1,51 @@
+# Grafana configuration
+grafana:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    hosts:
+      - grafana.{{CLUSTER_DOMAIN}}
+    path: /
+    pathType: Prefix
+  
+  # Security settings
+  adminPassword: admin
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Prometheus configuration
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: manual
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+# Alertmanager configuration
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: manual
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+# Kube-state-metrics
+kube-state-metrics:
+  enabled: true
+
+# Node-exporter
+node-exporter:
+  enabled: true

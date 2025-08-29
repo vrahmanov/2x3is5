@@ -1,0 +1,11 @@
+controller:
+  service:
+    type: LoadBalancer
+  config:
+    default-ssl-certificate: "ingress/nginx-server-certs"
+  extraArgs:
+    default-ssl-certificate: "ingress/nginx-server-certs"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true

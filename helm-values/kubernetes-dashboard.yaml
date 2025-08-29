@@ -1,0 +1,23 @@
+service:
+  type: ClusterIP
+
+protocolHttp: true
+enableInsecureLogin: true
+
+# Enable ingress for external access
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: dashboard.local.io
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Security settings
+extraArgs:
+  - --enable-insecure-login
+  - --enable-skip-login
