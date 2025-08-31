@@ -62,7 +62,7 @@ Install the required dependencies:
 
 #### **macOS**
 ```bash
-brew install kubectl docker k3d argocd go jq curl make
+brew install kubectl docker k3d argocd helm go jq curl make
 ```
 
 #### **Ubuntu/Debian**
@@ -74,6 +74,9 @@ sudo systemctl start docker
 
 # Install k3d
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+# Install Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # Install ArgoCD CLI
 curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -247,6 +250,45 @@ This runs comprehensive tests including:
 - Redis connectivity
 - Data validation
 
+### **Ubuntu 22.04 Compatibility Testing**
+To ensure the setup works correctly on Ubuntu 22.04, we provide automated testing in Docker containers:
+
+#### **Quick Test (Recommended)**
+```bash
+make test-ubuntu
+```
+
+This runs complete end-to-end tests in a Ubuntu 22.04 Docker container:
+- Requirements check
+- Application build
+- Binary verification
+- Complete infrastructure setup (K3D cluster, ArgoCD, etc.)
+- Application deployment
+- Application testing and validation
+
+#### **Full Test (Comprehensive)**
+```bash
+make test-ubuntu-full
+```
+
+This runs a complete test suite including:
+- All dependencies installation
+- Complete workflow testing
+- Application functionality testing
+- Detailed test report generation
+
+#### **What the Tests Verify**
+- ✅ **Requirements Check**: All dependencies install correctly on Ubuntu 22.04
+- ✅ **Architecture Detection**: Correctly detects ARM64/AMD64 and builds appropriate binaries
+- ✅ **Application Build**: Go binary compilation and Docker image creation
+- ✅ **Binary Verification**: Confirms correct architecture and executable format
+- ✅ **K3D Cluster Management**: Kubernetes cluster creation, configuration, and management
+- ✅ **Nginx Ingress**: Ingress controller installation and configuration
+- ✅ **Docker Integration**: Docker-in-Docker functionality and image import
+- ✅ **Application Deployment**: Complete deployment of Redis and Music App
+- ✅ **Kubernetes Resources**: Namespace, deployments, services, and configmaps
+- ✅ **Cross-Platform Compatibility**: Works on different architectures and operating systems
+
 ### **Manual Testing**
 ```bash
 # Test health endpoint
@@ -283,6 +325,12 @@ This removes:
 
 ## 🔍 **Troubleshooting**
 
+### **Quick Troubleshooting**
+```bash
+# Run comprehensive troubleshooting
+make troubleshoot
+```
+
 ### **Common Issues**
 
 #### **1. Dependencies Missing**
@@ -306,6 +354,34 @@ argocd app get music-app
 argocd app sync music-app
 ```
 
+#### **5. Pod Timeout Issues**
+If you see "timed out waiting for the condition on pods", try:
+```bash
+# Check if Docker image exists
+docker images | grep music-app
+
+# Build the application first
+make app_build
+
+# Then deploy
+make app_deploy
+
+# Or run complete workflow
+make all
+```
+
+#### **6. Binary Architecture Issues**
+If you see "exec ./server: no such file or directory" in pod logs:
+```bash
+# Quick fix for architecture mismatch
+make fix-binary
+
+# Or manually rebuild with correct architecture
+docker rmi music-app:latest
+make app_build
+make app_deploy
+```
+
 ### **Debugging Commands**
 ```bash
 # Check cluster status
@@ -320,9 +396,32 @@ kubectl get pods -n music-app
 # Check ingress status
 kubectl get ingress -n music-app
 
+# Check pod events
+kubectl get events -n music-app --sort-by='.lastTimestamp'
+
 # Test connectivity
-curl -k https://music.local.io:6600/health
+curl http://music.local.io:44134/health
 ```
+
+### **Complete Reset**
+If you're having persistent issues:
+```bash
+# Clean everything and start fresh
+make clean-all
+make all
+```
+
+### **Ubuntu Compatibility Testing**
+If you're experiencing issues on Ubuntu, test the setup:
+```bash
+# Quick test in Ubuntu 22.04 container
+make test-ubuntu
+
+# Full comprehensive test
+make test-ubuntu-full
+```
+
+This will verify that all components work correctly in a clean Ubuntu 22.04 environment.
 
 ## 🚀 **Production Flow Structure**
 

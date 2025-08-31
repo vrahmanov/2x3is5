@@ -52,12 +52,48 @@ if [ ! -f "main.go" ]; then
     exit 1
 fi
 
-# Build for Linux (for Docker container)
-print_status "Building for Linux architecture..."
-GOOS=linux GOARCH=amd64 go build -o server main.go
+# Detect target architecture for Docker
+print_status "Detecting target architecture..."
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # On macOS, check if it's Apple Silicon
+    if [[ $(uname -m) == "arm64" ]]; then
+        TARGET_ARCH="arm64"
+        print_status "Detected Apple Silicon (ARM64)"
+    else
+        TARGET_ARCH="amd64"
+        print_status "Detected Intel Mac (AMD64)"
+    fi
+else
+    # On Linux, check the architecture
+    if [[ $(uname -m) == "aarch64" ]]; then
+        TARGET_ARCH="arm64"
+        print_status "Detected ARM64 Linux"
+    else
+        TARGET_ARCH="amd64"
+        print_status "Detected AMD64 Linux"
+    fi
+fi
+
+# Build for Linux with detected architecture
+print_status "Building for Linux $TARGET_ARCH architecture..."
+GOOS=linux GOARCH=$TARGET_ARCH go build -o server main.go
 
 if [ $? -eq 0 ]; then
     print_status "Go application built successfully"
+    
+    # Verify the binary
+    if [ -f "server" ]; then
+        print_status "Binary verification:"
+        if command -v file >/dev/null 2>&1; then
+            file server
+        else
+            print_warning "file command not available, skipping binary type check"
+        fi
+        ls -la server
+    else
+        print_error "Binary 'server' not found after build"
+        exit 1
+    fi
 else
     print_error "Failed to build Go application"
     exit 1

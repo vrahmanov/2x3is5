@@ -100,13 +100,14 @@ show_install_instructions() {
         "macOS")
             echo ""
             echo "Install using Homebrew:"
-            echo "  brew install kubectl docker k3d argocd go jq curl make"
+            echo "  brew install kubectl docker k3d argocd helm go jq curl make"
             echo ""
             echo "Or install individually:"
             echo "  brew install kubectl"
             echo "  brew install docker"
             echo "  brew install k3d"
             echo "  brew install argocd"
+            echo "  brew install helm"
             echo "  brew install go"
             echo "  brew install jq"
             echo "  brew install curl"
@@ -127,6 +128,9 @@ show_install_instructions() {
             echo "Install k3d:"
             echo "  curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash"
             echo ""
+            echo "Install Helm:"
+            echo "  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+            echo ""
             echo "Install ArgoCD CLI:"
             echo "  curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64"
             echo "  sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd"
@@ -139,6 +143,7 @@ show_install_instructions() {
             echo "  - docker"
             echo "  - k3d"
             echo "  - argocd"
+            echo "  - helm"
             echo "  - go"
             echo "  - jq"
             echo "  - curl"
@@ -201,6 +206,15 @@ main() {
         print_success "ArgoCD CLI: Installed"
     else
         missing_tools+=("argocd")
+        all_good=false
+    fi
+    
+    # Check Helm
+    print_status "Checking Helm..."
+    if check_version helm version; then
+        print_success "Helm: Installed"
+    else
+        missing_tools+=("helm")
         all_good=false
     fi
     

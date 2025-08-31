@@ -66,7 +66,7 @@ app_build: check-requirements ## Build the music application
 	@echo "$(GREEN)[INFO]$(NC) Application build completed"
 
 .PHONY: app_deploy
-app_deploy: check-requirements ## Deploy application using GitOps
+app_deploy: check-requirements app_build ## Deploy application using GitOps
 	@echo "$(BLUE)[STEP]$(NC) Deploying application with GitOps..."
 	@./apps/music-app/deploy.sh
 	@echo "$(GREEN)[INFO]$(NC) Application deployment completed"
@@ -165,6 +165,26 @@ monitor: ## Start monitoring
 status: ## Show overall status
 	@echo "$(BLUE)[STEP]$(NC) Showing overall status..."
 	@./scripts/status.sh
+
+.PHONY: troubleshoot
+troubleshoot: ## Troubleshoot deployment issues
+	@echo "$(BLUE)[STEP]$(NC) Running deployment troubleshooting..."
+	@./scripts/troubleshoot-deployment.sh
+
+.PHONY: fix-binary
+fix-binary: ## Fix binary architecture issues
+	@echo "$(BLUE)[STEP]$(NC) Fixing binary architecture issues..."
+	@./scripts/fix-binary-issue.sh
+
+.PHONY: test-ubuntu
+test-ubuntu: ## Test complete setup in Ubuntu 22.04 Docker container
+	@echo "$(BLUE)[STEP]$(NC) Testing setup in Ubuntu 22.04 Docker container..."
+	@./scripts/test-ubuntu-simple.sh
+
+.PHONY: test-ubuntu-full
+test-ubuntu-full: ## Full test in Ubuntu 22.04 Docker container (comprehensive)
+	@echo "$(BLUE)[STEP]$(NC) Running full test in Ubuntu 22.04 Docker container..."
+	@./scripts/test-ubuntu-docker.sh
 
 # GitOps specific targets
 .PHONY: gitops-sync
